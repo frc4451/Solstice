@@ -18,15 +18,6 @@
             opencv4 = prev.opencv4.override {
               enableGtk3 = true;
             };
-
-            python312Packages =
-              prev.python312Packages
-              // {
-                opencv4 = final.opencv4.override {
-                  enablePython = true;
-                  pythonPackages = final.python312Packages;
-                };
-              };
           })
         ];
       });
