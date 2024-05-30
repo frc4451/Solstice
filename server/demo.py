@@ -77,6 +77,9 @@ if __name__ == "__main__":
         process.join()
 
     # Cleanup
+    if not WEBVIEW:
+        cv2.destroyAllWindows()
+
     capture.release()
     capture2.release()
     capture3.release()
