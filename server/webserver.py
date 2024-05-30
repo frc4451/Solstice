@@ -70,17 +70,19 @@ class VideoWebServer(http.server.BaseHTTPRequestHandler):
 
 
 def run_webview(capture: cv2.VideoCapture, aruco_detector: cv2.aruco.ArucoDetector, port: int = 4451):
-        try:
-            with socketserver.TCPServer(
-                ("", port),
-                lambda *args, **kwargs: VideoWebServer(
-                    *args, capture=capture, aruco_detector=aruco_detector, **kwargs
-                ),
-            ) as httpd:
-                print("Server started at localhost:" + str(port))
-                httpd.serve_forever()
-        except KeyboardInterrupt:
-            httpd.server_close()
-            print("Server stopped")
-        finally:
-            httpd.server_close()
+    tcp_server: socketserver.TCPServer | None = None
+    try:
+        with socketserver.TCPServer(
+            ("", port),
+            lambda *args, **kwargs: VideoWebServer(
+                *args, capture=capture, aruco_detector=aruco_detector, **kwargs
+            ),
+        ) as httpd:
+            tcp_server = httpd
+            tcp_server.serve_forever()
+            print("Server started at localhost:" + str(port))
+    finally:
+        if tcp_server is not None:
+            tcp_server.shutdown()
+            tcp_server.server_close()
+            print("Web Server stopped")
