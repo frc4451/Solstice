@@ -55,7 +55,7 @@ if __name__ == "__main__":
         dictionary=cv2.aruco.DICT_APRILTAG_16h5
     )
 
-    processes = []
+    processes: list[multiprocessing.Process] = []
 
     if WEBVIEW:
         elp_process = multiprocessing.Process(target=run_webview, args=(capture, aruco_detector, 4451))
@@ -73,8 +73,12 @@ if __name__ == "__main__":
     for process in processes:
         process.start()
 
-    for process in processes:
-        process.join()
+    try:
+        for process in processes:
+            process.join()
+    finally:
+        for process in processes:
+            process.terminate()
 
     # Cleanup
     if not WEBVIEW:
@@ -83,4 +87,3 @@ if __name__ == "__main__":
     capture.release()
     capture2.release()
     capture3.release()
-    cv2.destroyAllWindows()
