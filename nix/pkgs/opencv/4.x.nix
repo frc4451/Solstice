@@ -574,13 +574,6 @@ in
         pushd dist
         python -m pip install ./*.whl --no-index --no-warn-script-location --prefix="$out" --no-cache
 
-        # the cv2/__init__.py just tries to check provide "nice user feedback" if the installation is bad
-        # however, this also causes infinite recursion when used by other packages.
-        rm $out/${pythonPackages.python.sitePackages}/cv2/__init__.py
-        touch $out/${pythonPackages.python.sitePackages}/cv2/__init__.py
-        # ^ for whatever reason `echo "" > path/to/__init__.py` doesn't seem to work?
-        # i'm guessing it's something to do with permissions
-
         popd
         popd
       '';
