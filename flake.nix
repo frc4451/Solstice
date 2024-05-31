@@ -15,9 +15,22 @@
 
         overlays = [
           (final: prev: {
-            opencv4 = prev.opencv4.override {
-              enableGtk3 = true;
-            };
+            opencv4 = with final;
+              callPackage nix/pkgs/opencv/4.x.nix {
+                inherit
+                  (darwin.apple_sdk.frameworks)
+                  AVFoundation
+                  Cocoa
+                  VideoDecodeAcceleration
+                  CoreMedia
+                  MediaToolbox
+                  Accelerate
+                  ;
+                pythonPackages = python3Packages;
+                # On top our custom fixes for type stubs (to be upstreamed),
+                # Gtk3 is needed for the "local" GUI to work.
+                enableGtk3 = true;
+              };
           })
         ];
       });
