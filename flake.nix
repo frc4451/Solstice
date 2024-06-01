@@ -31,6 +31,14 @@
                 # Gtk3 is needed for the "local" GUI to work.
                 enableGtk3 = true;
               };
+
+            python312 = prev.python312.override {
+              packageOverrides = self: super: {
+                pyntcore = self.callPackage nix/pkgs/pyntcore {};
+                robotpy-wpinet = self.callPackage nix/pkgs/robotpy-wpinet {};
+                robotpy-wpiutil = self.callPackage nix/pkgs/robotpy-wpiutil {};
+              };
+            };
           })
         ];
       });
@@ -52,6 +60,8 @@
           # setuptools
           werkzeug
           # wheel
+
+          pyntcore
         ]);
 
       # https://wiki.nixos.org/wiki/GStreamer
