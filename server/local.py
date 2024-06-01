@@ -1,9 +1,14 @@
-from math import ceil
 import time
+from math import ceil
+
 import cv2
 
 
-def run_local(capture: cv2.VideoCapture, aruco_detector: cv2.aruco.ArucoDetector, label: str = "Frame"):
+def run_local(
+    capture: cv2.VideoCapture,
+    aruco_detector: cv2.aruco.ArucoDetector,
+    label: str = "Frame",
+) -> None:
     # Infinite loop to see camera
     while True:
         start_time = time.time()
@@ -23,7 +28,7 @@ def run_local(capture: cv2.VideoCapture, aruco_detector: cv2.aruco.ArucoDetector
         grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         corners, ids, _ = aruco_detector.detectMarkers(grayscale)
 
-        if ids is not None:
+        if ids.size > 0:
             # 2d marking
             cv2.aruco.drawDetectedMarkers(frame, corners, ids)
 

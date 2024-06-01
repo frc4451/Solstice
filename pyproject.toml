@@ -1,0 +1,3 @@
+[tool.basedpyright]
+reportImplicitRelativeImport = false
+reportUnusedCallResult = false

@@ -8,13 +8,13 @@ Further reading:
 """
 
 import multiprocessing
+
 import cv2
-
-
 from local import run_local
 from webserver import run_webview
 
 WEBVIEW: bool = False
+
 
 def get_capture(
     index: int = 0, width: int = 1920, height: int = 1080, fps: int = 90
@@ -31,7 +31,7 @@ def get_capture(
         exit(1)
 
     # Capture settings (ELP Camera testing)
-    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))  # type: ignore[reportAttributeAccessIssue]
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
     capture.set(cv2.CAP_PROP_FPS, fps)
@@ -39,7 +39,9 @@ def get_capture(
     return capture
 
 
-def get_aruco_detector(dictionary: int = cv2.aruco.DICT_APRILTAG_36h11):
+def get_aruco_detector(
+    dictionary: int = cv2.aruco.DICT_APRILTAG_36h11,
+) -> cv2.aruco.ArucoDetector:
     aruco_dict = cv2.aruco.getPredefinedDictionary(dictionary)
     aruco_params = cv2.aruco.DetectorParameters()
     aruco_detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
@@ -58,13 +60,25 @@ if __name__ == "__main__":
     processes: list[multiprocessing.Process] = []
 
     if WEBVIEW:
-        elp_process = multiprocessing.Process(target=run_webview, args=(capture, aruco_detector, 4451))
-        arducam_process = multiprocessing.Process(target=run_webview, args=(capture2, aruco_detector, 4452))
-        elp_process2 = multiprocessing.Process(target=run_webview, args=(capture3, aruco_detector, 4453))
+        elp_process = multiprocessing.Process(
+            target=run_webview, args=(capture, aruco_detector, 4451)
+        )
+        arducam_process = multiprocessing.Process(
+            target=run_webview, args=(capture2, aruco_detector, 4452)
+        )
+        elp_process2 = multiprocessing.Process(
+            target=run_webview, args=(capture3, aruco_detector, 4453)
+        )
     else:
-        elp_process = multiprocessing.Process(target=run_local, args=(capture, aruco_detector, "ELP AR0234"))
-        arducam_process = multiprocessing.Process(target=run_local, args=(capture2, aruco_detector, "Arducam OV2311"))
-        elp_process2 = multiprocessing.Process(target=run_local, args=(capture3, aruco_detector, "ELP AR0234 WIDE"))
+        elp_process = multiprocessing.Process(
+            target=run_local, args=(capture, aruco_detector, "ELP AR0234")
+        )
+        arducam_process = multiprocessing.Process(
+            target=run_local, args=(capture2, aruco_detector, "Arducam OV2311")
+        )
+        elp_process2 = multiprocessing.Process(
+            target=run_local, args=(capture3, aruco_detector, "ELP AR0234 WIDE")
+        )
 
     processes.append(elp_process2)
     processes.append(elp_process)
