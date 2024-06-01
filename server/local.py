@@ -28,7 +28,7 @@ def run_local(
         grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         corners, ids, _ = aruco_detector.detectMarkers(grayscale)
 
-        if ids.size > 0:
+        if ids is not None:  # type: ignore[reportUnnecessaryComparison]
             # 2d marking
             cv2.aruco.drawDetectedMarkers(frame, corners, ids)
 

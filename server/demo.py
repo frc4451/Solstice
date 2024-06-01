@@ -8,12 +8,16 @@ Further reading:
 """
 
 import multiprocessing
+from dataclasses import dataclass
 
 import cv2
+import ntcore
 from local import run_local
-from webserver import run_webview
 
-WEBVIEW: bool = False
+# from webserver import run_webview
+
+TEAM = 4451
+WEBVIEW = False
 
 
 def get_capture(
@@ -49,55 +53,122 @@ def get_aruco_detector(
     return aruco_detector
 
 
+class Camera:
+    capture: cv2.VideoCapture
+    proccess: multiprocessing.Process
+
+    def __init__(
+        self, capture: cv2.VideoCapture, proccess: multiprocessing.Process
+    ) -> None:
+        self.capture = capture
+        self.proccess = proccess
+        # self.proccess.start()
+
+    def terminate(self) -> None:
+        self.proccess.terminate()
+        self.capture.release()
+
+
+@dataclass
+class CameraConfig:
+    custom_user_id: str
+    v4l_index: int
+    width: int
+    height: int
+    fps: int
+    aruco_dict: int
+
+
+class CameraManager:
+    def __init__(self) -> None:
+        self.cameras: dict[str, Camera] = {}
+
+    def load_camera_config(self, camera_config: CameraConfig) -> None:
+        camera_to_update = self.cameras.get(camera_config.custom_user_id)
+        if camera_to_update != None:
+            camera_to_update.terminate()
+
+        capture = get_capture(
+            index=camera_config.v4l_index,
+            width=camera_config.width,
+            height=camera_config.height,
+            fps=camera_config.fps,
+        )
+
+        aruco_detector = get_aruco_detector(camera_config.aruco_dict)
+
+        process = multiprocessing.Process(
+            target=run_local,
+            args=(capture, aruco_detector, camera_config.custom_user_id),
+        )
+
+        self.cameras[camera_config.custom_user_id] = Camera(capture, process)
+
+    def terminate_all(self) -> None:
+        for camera in self.cameras.values():
+            camera.terminate()
+
+
 if __name__ == "__main__":
-    capture: cv2.VideoCapture = get_capture(index=0, width=1920, height=1080, fps=90)
-    capture3: cv2.VideoCapture = get_capture(index=6, width=1920, height=1080, fps=90)
-    capture2: cv2.VideoCapture = get_capture(index=4, width=1600, height=1200, fps=50)
-    aruco_detector: cv2.aruco.ArucoDetector = get_aruco_detector(
-        dictionary=cv2.aruco.DICT_APRILTAG_16h5
+    camera_manager = CameraManager()
+
+    camera_manager.load_camera_config(
+        CameraConfig(
+            "my_epic_webcam",
+            0,
+            1920,
+            1080,
+            30,
+            cv2.aruco.DICT_APRILTAG_16h5,
+        )
     )
 
-    processes: list[multiprocessing.Process] = []
+    nt = ntcore.NetworkTableInstance.create()
+    nt.setServerTeam(TEAM, 2017)
 
-    if WEBVIEW:
-        elp_process = multiprocessing.Process(
-            target=run_webview, args=(capture, aruco_detector, 4451)
-        )
-        arducam_process = multiprocessing.Process(
-            target=run_webview, args=(capture2, aruco_detector, 4452)
-        )
-        elp_process2 = multiprocessing.Process(
-            target=run_webview, args=(capture3, aruco_detector, 4453)
-        )
-    else:
-        elp_process = multiprocessing.Process(
-            target=run_local, args=(capture, aruco_detector, "ELP AR0234")
-        )
-        arducam_process = multiprocessing.Process(
-            target=run_local, args=(capture2, aruco_detector, "Arducam OV2311")
-        )
-        elp_process2 = multiprocessing.Process(
-            target=run_local, args=(capture3, aruco_detector, "ELP AR0234 WIDE")
-        )
+    # if WEBVIEW:
+    #     elp_process = multiprocessing.Process(
+    #         target=run_webview, args=(capture, aruco_detector, 4451)
+    #     )
+    #     # arducam_process = multiprocessing.Process(
+    #     #     target=run_webview, args=(capture2, aruco_detector, 4452)
+    #     # )
+    #     # elp_process2 = multiprocessing.Process(
+    #     #     target=run_webview, args=(capture3, aruco_detector, 4453)
+    #     # )
+    # else:
+    #     elp_process = multiprocessing.Process(
+    #         target=run_local, args=(capture, aruco_detector, "ELP AR0234")
+    #     )
+    #     # arducam_process = multiprocessing.Process(
+    #     #     target=run_local, args=(capture2, aruco_detector, "Arducam OV2311")
+    #     # )
+    #     # elp_process2 = multiprocessing.Process(
+    #     #     target=run_local, args=(capture3, aruco_detector, "ELP AR0234 WIDE")
+    #     # )
 
-    processes.append(elp_process2)
-    processes.append(elp_process)
-    processes.append(arducam_process)
-
-    for process in processes:
-        process.start()
-
+    # for process in processes:
+    #     process.start()
+    #
+    # try:
+    #     for process in processes:
+    #         process.join()
+    # finally:
+    #     for process in processes:
+    #         process.terminate()
+    for camera in camera_manager.cameras.values():
+        camera.proccess.start()
     try:
-        for process in processes:
-            process.join()
+        # for camera in camera_manager.cameras.values():
+        #     camera.proccess.join()
+        pass
     finally:
-        for process in processes:
-            process.terminate()
+        camera_manager.terminate_all()
 
     # Cleanup
-    if not WEBVIEW:
-        cv2.destroyAllWindows()
+    # if not WEBVIEW:
+    # cv2.destroyAllWindows()
 
-    capture.release()
-    capture2.release()
-    capture3.release()
+    # capture.release()
+    # capture2.release()
+    # capture3.release()
