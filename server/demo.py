@@ -112,6 +112,10 @@ class CameraManager:
         for camera in self.cameras.values():
             camera.proccess.join()
 
+        # In case more proccesses have been added we need to check again
+        if len(self.cameras) != 0:
+            self.wait_for_proccesses()
+
 
 if __name__ == "__main__":
     camera_manager = CameraManager()
