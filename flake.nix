@@ -1,7 +1,13 @@
 {
   description = "Development Shell for running Solstice in a reproducible environment";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    # This custom nixpkgs has a version of OpenCV with Python Type Stubs available,
+    # this is planned to be upstreamed
+    custom-nixpkgs.url = "github:frc4451/nixpkgs/python-opencv-type-stubs";
+  };
 
   outputs = {...} @ inputs: let
     inherit (inputs.nixpkgs) lib;
@@ -16,7 +22,7 @@
         overlays = [
           (final: prev: {
             opencv4 = with final;
-              callPackage nix/pkgs/opencv/4.x.nix {
+              callPackage "${inputs.custom-nixpkgs}/pkgs/development/libraries/opencv/4.x.nix" {
                 inherit
                   (darwin.apple_sdk.frameworks)
                   AVFoundation
@@ -27,9 +33,6 @@
                   Accelerate
                   ;
                 pythonPackages = python3Packages;
-                # On top our custom fixes for type stubs (to be upstreamed),
-                # Gtk3 is needed for the "local" GUI to work.
-                enableGtk3 = true;
               };
 
             python312 = prev.python312.override {

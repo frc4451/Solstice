@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "custom-nixpkgs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1717347759,
+        "narHash": "sha256-NDAZSZky3oFMRudVhipdYmci8r7xmPFqEq9gozZyt54=",
+        "owner": "frc4451",
+        "repo": "nixpkgs",
+        "rev": "8c646bc074245b7012079fe3a16cfac9ca526dfa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "frc4451",
+        "ref": "python-opencv-type-stubs",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1716509168,
@@ -18,6 +35,7 @@
     },
     "root": {
       "inputs": {
+        "custom-nixpkgs": "custom-nixpkgs",
         "nixpkgs": "nixpkgs"
       }
     }
