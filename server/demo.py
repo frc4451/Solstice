@@ -24,7 +24,7 @@ def get_capture(
     index: int = 0, width: int = 1920, height: int = 1080, fps: int = 90
 ) -> cv2.VideoCapture:
     # Open basic video capture
-    capture: cv2.VideoCapture = cv2.VideoCapture(index)
+    capture: cv2.VideoCapture = cv2.VideoCapture(index, cv2.CAP_V4L2)
 
     # We should eventually have it use GStreamer, but this is not loading on my system
     # capture = cv2.VideoCapture("v4l2src device=dev/video0 ! image/jpeg,format=MJPG,width=1600,height=1200", cv2.CAP_GSTREAMER)
@@ -62,7 +62,7 @@ class Camera:
     ) -> None:
         self.capture = capture
         self.proccess = proccess
-        # self.proccess.start()
+        self.proccess.start()
 
     def terminate(self) -> None:
         self.proccess.terminate()
@@ -108,6 +108,10 @@ class CameraManager:
         for camera in self.cameras.values():
             camera.terminate()
 
+    def wait_for_proccesses(self) -> None:
+        for camera in self.cameras.values():
+            camera.proccess.join()
+
 
 if __name__ == "__main__":
     camera_manager = CameraManager()
@@ -130,45 +134,12 @@ if __name__ == "__main__":
     #     elp_process = multiprocessing.Process(
     #         target=run_webview, args=(capture, aruco_detector, 4451)
     #     )
-    #     # arducam_process = multiprocessing.Process(
-    #     #     target=run_webview, args=(capture2, aruco_detector, 4452)
-    #     # )
-    #     # elp_process2 = multiprocessing.Process(
-    #     #     target=run_webview, args=(capture3, aruco_detector, 4453)
-    #     # )
     # else:
     #     elp_process = multiprocessing.Process(
     #         target=run_local, args=(capture, aruco_detector, "ELP AR0234")
     #     )
-    #     # arducam_process = multiprocessing.Process(
-    #     #     target=run_local, args=(capture2, aruco_detector, "Arducam OV2311")
-    #     # )
-    #     # elp_process2 = multiprocessing.Process(
-    #     #     target=run_local, args=(capture3, aruco_detector, "ELP AR0234 WIDE")
-    #     # )
 
-    # for process in processes:
-    #     process.start()
-    #
-    # try:
-    #     for process in processes:
-    #         process.join()
-    # finally:
-    #     for process in processes:
-    #         process.terminate()
-    for camera in camera_manager.cameras.values():
-        camera.proccess.start()
     try:
-        # for camera in camera_manager.cameras.values():
-        #     camera.proccess.join()
-        pass
+        camera_manager.wait_for_proccesses()
     finally:
         camera_manager.terminate_all()
-
-    # Cleanup
-    # if not WEBVIEW:
-    # cv2.destroyAllWindows()
-
-    # capture.release()
-    # capture2.release()
-    # capture3.release()
