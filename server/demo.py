@@ -12,12 +12,9 @@ from dataclasses import dataclass
 
 import cv2
 import ntcore
-from local import run_local
-
-# from webserver import run_webview
+from webserver import run_webview
 
 TEAM = 4451
-WEBVIEW = False
 
 
 def get_capture(
@@ -53,30 +50,45 @@ def get_aruco_detector(
     return aruco_detector
 
 
-class Camera:
-    capture: cv2.VideoCapture
-    proccess: multiprocessing.Process
-
-    def __init__(
-        self, capture: cv2.VideoCapture, proccess: multiprocessing.Process
-    ) -> None:
-        self.capture = capture
-        self.proccess = proccess
-        self.proccess.start()
-
-    def terminate(self) -> None:
-        self.proccess.terminate()
-        self.capture.release()
-
-
 @dataclass
 class CameraConfig:
     custom_user_id: str
+    web_port: int
     v4l_index: int
     width: int
     height: int
     fps: int
     aruco_dict: int
+
+
+class Camera:
+    def __init__(self, config: CameraConfig) -> None:
+        self.config = config
+
+        self.aruco_detector = get_aruco_detector(config.aruco_dict)
+
+        self.capture = get_capture(
+            index=config.v4l_index,
+            width=config.width,
+            height=config.height,
+            fps=config.fps,
+        )
+
+        self.process = multiprocessing.Process(
+            target=run_webview,
+            args=(
+                self.capture,
+                self.aruco_detector,
+                config.web_port,
+                config.custom_user_id,
+            ),
+        )
+
+        self.process.start()
+
+    def terminate(self) -> None:
+        self.process.terminate()
+        self.capture.release()
 
 
 class CameraManager:
@@ -88,21 +100,7 @@ class CameraManager:
         if camera_to_update != None:
             camera_to_update.terminate()
 
-        capture = get_capture(
-            index=camera_config.v4l_index,
-            width=camera_config.width,
-            height=camera_config.height,
-            fps=camera_config.fps,
-        )
-
-        aruco_detector = get_aruco_detector(camera_config.aruco_dict)
-
-        process = multiprocessing.Process(
-            target=run_local,
-            args=(capture, aruco_detector, camera_config.custom_user_id),
-        )
-
-        self.cameras[camera_config.custom_user_id] = Camera(capture, process)
+        self.cameras[camera_config.custom_user_id] = Camera(camera_config)
 
     def terminate_all(self) -> None:
         for camera in self.cameras.values():
@@ -110,10 +108,10 @@ class CameraManager:
 
     def wait_for_proccesses(self) -> None:
         for camera in self.cameras.values():
-            camera.proccess.join()
+            camera.process.join()
 
         # In case more proccesses have been added we need to check again
-        if len(self.cameras) != 0:
+        if len(self.cameras.values()) > 0:
             self.wait_for_proccesses()
 
 
@@ -123,6 +121,7 @@ if __name__ == "__main__":
     camera_manager.load_camera_config(
         CameraConfig(
             "my_epic_webcam",
+            8080,
             0,
             1920,
             1080,
@@ -133,15 +132,6 @@ if __name__ == "__main__":
 
     nt = ntcore.NetworkTableInstance.create()
     nt.setServerTeam(TEAM, 2017)
-
-    # if WEBVIEW:
-    #     elp_process = multiprocessing.Process(
-    #         target=run_webview, args=(capture, aruco_detector, 4451)
-    #     )
-    # else:
-    #     elp_process = multiprocessing.Process(
-    #         target=run_local, args=(capture, aruco_detector, "ELP AR0234")
-    #     )
 
     try:
         camera_manager.wait_for_proccesses()
