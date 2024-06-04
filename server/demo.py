@@ -130,8 +130,21 @@ if __name__ == "__main__":
         )
     )
 
-    nt = ntcore.NetworkTableInstance.create()
-    nt.setServerTeam(TEAM, 2017)
+    nt_root = "/Solstice"
+    nt = ntcore.NetworkTableInstance.getDefault()
+    nt.startClient4("Solstice")
+    nt.setServerTeam(TEAM)
+    nt.setServer("localhost", ntcore.NetworkTableInstance.kDefaultPort4)
+    nt.startServer()
+
+    n_topic = nt.getIntegerTopic(nt_root + "/among")
+
+    n_publisher = n_topic.publish()
+
+    n_publisher.setDefault(0)
+    n_publisher.set(69)
+
+    print(n_topic.getEntry(0).get())
 
     try:
         camera_manager.wait_for_proccesses()
