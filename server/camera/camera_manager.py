@@ -1,5 +1,5 @@
 from server.camera.camera import Camera
-from server.camera.types import CameraConfig
+from server.types import CameraConfig
 
 
 class CameraManager:

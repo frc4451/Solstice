@@ -1,3 +1,11 @@
 [tool.basedpyright]
 reportImplicitRelativeImport = false
 reportUnusedCallResult = false
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+skip-string-normalization = false
+single-quote = false
+check = false
+skip-magic-trailing-comma = false
