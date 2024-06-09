@@ -18,9 +18,11 @@ class CameraManager:
             camera.terminate()
 
     def wait_for_proccesses(self) -> None:
+        # Check if *any* processes are alive
+        # If so wait for that *one*
+        # Then check again
+        # Once none are alive we can finally end this recursive calling
         for camera in self.cameras.values():
-            camera.process.join()
-
-        # In case more proccesses have been added we need to check again
-        if len(self.cameras.values()) > 0:
-            self.wait_for_proccesses()
+            if camera.process.is_alive():
+                camera.process.join()
+                return self.wait_for_proccesses()
