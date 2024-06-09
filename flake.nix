@@ -85,7 +85,12 @@
       ];
     in {
       default = pkgs.mkShell {
-        packages = [pythonWithPackages] ++ gstreamerPackages;
+        packages =
+          [pythonWithPackages]
+          ++ gstreamerPackages
+          ++ (with pkgs; [
+            black
+          ]);
         shellHook = ''
           export GST_V4L2_USE_LIBV4L2=1
         '';
