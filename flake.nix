@@ -37,6 +37,7 @@
 
             python312 = prev.python312.override {
               packageOverrides = self: super: {
+                mjpeg-streamer = self.callPackage nix/pkgs/mjpeg-streamer {};
                 pyntcore = self.callPackage nix/pkgs/pyntcore {};
                 robotpy-wpinet = self.callPackage nix/pkgs/robotpy-wpinet {};
                 robotpy-wpiutil = self.callPackage nix/pkgs/robotpy-wpiutil {};
@@ -64,6 +65,7 @@
           werkzeug
           # wheel
 
+          mjpeg-streamer
           pyntcore
         ]);
 

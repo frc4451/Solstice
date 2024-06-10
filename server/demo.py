@@ -12,7 +12,7 @@ import cv2
 # import ntcore
 from server.camera.camera_manager import CameraManager
 from server.pipelines.aruco import ArucoDetectionPipeline
-from .types import CameraConfig
+from server.types import CameraConfig
 
 TEAM = 4451
 
