@@ -1,30 +1,31 @@
-from typing import Tuple
+from abc import ABC, abstractmethod
+from typing import override
 
 import cv2
+from cv2.typing import MatLike
 
-from server.types import CameraConfig, MatLike
+from server.types import CameraConfig
 
 
-class Capture:
+class Capture(ABC):
     """Interface for receiving Camera frames to use in other parts of the application."""
 
-    def __init__(self):
-        raise NotImplementedError
+    @abstractmethod
+    def get_frame(self) -> tuple[bool, MatLike]:
+        pass
 
-    def get_frame(self):
-        raise NotImplementedError
-
-    def release(self):
+    @abstractmethod
+    def release(self) -> None:
         raise NotImplementedError
 
 
 class DefaultCapture(Capture):
     """This will have to work until we get GStreamer working"""
 
-    def __init__(self, config: CameraConfig):
+    def __init__(self, config: CameraConfig) -> None:
         self._config = CameraConfig
 
-        self._video: cv2.VideoCapture = cv2.VideoCapture(config.v4l_index, cv2.CAP_V4L2)
+        self._video = cv2.VideoCapture(config.v4l_index, cv2.CAP_V4L2)
 
         if not self._video.isOpened():
             print("Cannot open capture at index ", config.v4l_index)
@@ -36,9 +37,11 @@ class DefaultCapture(Capture):
         self._video.set(cv2.CAP_PROP_FRAME_HEIGHT, config.height)
         self._video.set(cv2.CAP_PROP_FPS, config.fps)
 
-    def get_frame(self) -> Tuple[bool, MatLike]:
+    @override
+    def get_frame(self) -> tuple[bool, MatLike]:
         success, frame = self._video.read()
         return success, frame
 
-    def release(self):
+    @override
+    def release(self) -> None:
         self._video.release()
