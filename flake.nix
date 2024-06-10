@@ -92,6 +92,7 @@
           ++ gstreamerPackages
           ++ (with pkgs; [
             black
+            isort
           ]);
         shellHook = ''
           export GST_V4L2_USE_LIBV4L2=1
