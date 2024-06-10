@@ -38,8 +38,7 @@ class Camera:
 
         while True:
             _, raw_frame = self.capture.get_frame()
-            # _, processed_frame = self.detector.detect(frame)
-            processed_frame = raw_frame
+            processed_frame = self.detector.process(raw_frame.copy())
             self.raw_stream.set_frame(raw_frame)  # type: ignore[reportArgumentType]
             self.processed_stream.set_frame(processed_frame)  # type: ignore[reportArgumentType]
 
