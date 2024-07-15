@@ -35,7 +35,7 @@
                 pythonPackages = python3Packages;
               };
 
-            python312 = prev.python312.override {
+            python3 = prev.python3.override {
               packageOverrides = self: super: {
                 mjpeg-streamer = self.callPackage nix/pkgs/mjpeg-streamer {};
                 pyntcore = self.callPackage nix/pkgs/pyntcore {};
@@ -51,7 +51,7 @@
 
     devShells = eachSystem (system: let
       pkgs = pkgsFor.${system};
-      pythonWithPackages = pkgs.python312.withPackages (ps:
+      pythonWithPackages = pkgs.python3.withPackages (ps:
         with ps; [
           blinker
           click
