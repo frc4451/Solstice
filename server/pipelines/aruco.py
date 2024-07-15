@@ -1,7 +1,7 @@
 from typing import override
 
 import cv2
-from cv2.typing import MatLike
+from cv2 import UMat
 
 from server.pipelines.fiducial_pipeline import FiducialPipeline
 
@@ -13,7 +13,7 @@ class ArucoDetectionPipeline(FiducialPipeline):
         self._detector = cv2.aruco.ArucoDetector(self._dict, self._params)
 
     @override
-    def process(self, frame: MatLike) -> MatLike:
+    def process(self, frame: UMat) -> UMat:
         """Handle Aruco detection"""
         grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         corners, ids, _ = self._detector.detectMarkers(grayscale)

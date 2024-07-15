@@ -1,12 +1,6 @@
-import cv2
-
-from typing import Union
 from dataclasses import dataclass
 
 from server.pipelines.fiducial_pipeline import FiducialPipeline
-
-MatLike = Union[cv2.Mat, cv2.UMat]
-"""Could be either Mat, or UMat. But not GMat."""
 
 
 @dataclass

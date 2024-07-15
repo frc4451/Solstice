@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from cv2.typing import MatLike
+from cv2 import UMat
 
 
 class FiducialPipeline(ABC):
@@ -11,5 +11,5 @@ class FiducialPipeline(ABC):
         pass
 
     @abstractmethod
-    def process(self, frame: MatLike) -> MatLike:
+    def process(self, frame: UMat) -> UMat:
         pass
