@@ -39,12 +39,12 @@ class Camera:
 
         while True:
             _, raw_frame = self.capture.get_frame()
-            mat_frame = cv2.UMat(raw_frame)
+            mat_frame = cv2.UMat(raw_frame)  # type: ignore[reportArgumentType]
             processed_frame = self.detector.process(mat_frame)
             self.raw_stream.set_frame(mat_frame)  # type: ignore[reportArgumentType]
             self.processed_stream.set_frame(processed_frame)  # type: ignore[reportArgumentType]
 
     def terminate(self) -> None:
-        # self.server.stop()
+        self.server.stop()
         self.process.terminate()
         self.capture.release()

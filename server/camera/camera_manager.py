@@ -1,3 +1,5 @@
+from time import sleep
+
 from server.camera.camera import Camera
 from server.types import CameraConfig
 
@@ -7,9 +9,11 @@ class CameraManager:
         self.cameras: dict[str, Camera] = {}
 
     def load_camera_config(self, camera_config: CameraConfig) -> None:
-        camera_to_update = self.cameras.get(camera_config.custom_user_id)
-        if camera_to_update != None:
-            camera_to_update.terminate()
+        old_camera = self.cameras.get(camera_config.custom_user_id)
+        if old_camera != None:
+            old_camera.terminate()
+            # make sure the old capture is able to be released before we start trying to possibly use it again
+            sleep(0.1)
 
         self.cameras[camera_config.custom_user_id] = Camera(camera_config)
 
