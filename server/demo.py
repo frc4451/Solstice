@@ -18,6 +18,10 @@ TEAM = 4451
 
 
 if __name__ == "__main__":
+    if cv2.ocl.haveOpenCL():
+        print("OpenCL Enabled")
+        cv2.ocl.useOpenCL()
+
     camera_manager = CameraManager()
 
     camera_manager.load_camera_config(
