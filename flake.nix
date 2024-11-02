@@ -3,10 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
-    # This custom nixpkgs has a version of OpenCV with Python Type Stubs available,
-    # this is planned to be upstreamed
-    custom-nixpkgs.url = "github:frc4451/nixpkgs/python-opencv-type-stubs";
   };
 
   outputs = {...} @ inputs: let
@@ -21,20 +17,6 @@
 
         overlays = [
           (final: prev: {
-            opencv4 = with final;
-              callPackage "${inputs.custom-nixpkgs}/pkgs/development/libraries/opencv/4.x.nix" {
-                inherit
-                  (darwin.apple_sdk.frameworks)
-                  AVFoundation
-                  Cocoa
-                  VideoDecodeAcceleration
-                  CoreMedia
-                  MediaToolbox
-                  Accelerate
-                  ;
-                pythonPackages = python3Packages;
-              };
-
             python3 = prev.python3.override {
               packageOverrides = self: super: {
                 mjpeg-streamer = self.callPackage nix/pkgs/mjpeg-streamer {};

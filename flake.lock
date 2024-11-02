@@ -1,28 +1,12 @@
 {
   "nodes": {
-    "custom-nixpkgs": {
-      "locked": {
-        "lastModified": 1717618270,
-        "narHash": "sha256-NDAZSZky3oFMRudVhipdYmci8r7xmPFqEq9gozZyt54=",
-        "owner": "frc4451",
-        "repo": "nixpkgs",
-        "rev": "5add1fa44d485393925d5cb6e3370037866826b2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "frc4451",
-        "ref": "python-opencv-type-stubs",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1720957393,
-        "narHash": "sha256-oedh2RwpjEa+TNxhg5Je9Ch6d3W1NKi7DbRO1ziHemA=",
+        "lastModified": 1730200266,
+        "narHash": "sha256-l253w0XMT8nWHGXuXqyiIC/bMvh1VRszGXgdpQlfhvU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+        "rev": "807e9154dcb16384b1b765ebe9cd2bba2ac287fd",
         "type": "github"
       },
       "original": {
@@ -34,7 +18,6 @@
     },
     "root": {
       "inputs": {
-        "custom-nixpkgs": "custom-nixpkgs",
         "nixpkgs": "nixpkgs"
       }
     }
